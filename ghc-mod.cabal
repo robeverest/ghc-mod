@@ -94,7 +94,9 @@ Library
                         Language.Haskell.GhcMod.Target
                         Language.Haskell.GhcMod.Types
                         Language.Haskell.GhcMod.Utils
-  Build-Depends:        base >= 4.0 && < 5
+  Build-Depends:        aeson
+                      , bytestring
+                      , base >= 4.0 && < 5
                       , containers
                       , deepseq
                       , directory

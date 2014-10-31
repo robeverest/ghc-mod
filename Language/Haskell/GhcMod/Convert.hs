@@ -6,6 +6,8 @@ import Language.Haskell.GhcMod.Monad
 import Language.Haskell.GhcMod.Types
 
 import Control.Applicative ((<$>))
+import qualified Data.Aeson as A
+import Data.ByteString.Lazy.Char8 (unpack)
 
 type Builder = String -> String
 
@@ -33,10 +35,12 @@ convert opt@Options { outputStyle = PlainStyle } x
   | otherwise   = str
   where
     str = toPlain opt x "\n"
+convert Options { outputStyle = JsonStyle } x = toJSON x ++ "\n"
 
 class ToString a where
     toLisp  :: Options -> a -> Builder
     toPlain :: Options -> a -> Builder
+    toJSON  :: a -> String
 
 lineSep :: Options -> String
 lineSep opt = interpret lsep
@@ -53,6 +57,7 @@ lineSep opt = interpret lsep
 instance ToString String where
     toLisp  opt = quote opt
     toPlain opt = replace '\n' (lineSep opt)
+    toJSON      = unpack . A.encode
 
 -- |
 --
@@ -63,6 +68,7 @@ instance ToString String where
 instance ToString [String] where
     toLisp  opt = toSexp1 opt
     toPlain opt = inter '\n' . map (toPlain opt)
+    toJSON      = unpack . A.encode
 
 -- |
 --
@@ -76,19 +82,23 @@ instance ToString [((Int,Int,Int,Int),String)] where
       where
         toS x = ('(' :) . tupToString opt x . (')' :)
     toPlain opt = inter '\n' . map (tupToString opt)
+    toJSON      = unpack . A.encode
 
 instance ToString ((Int,Int,Int,Int),String) where
     toLisp  opt x = ('(' :) . tupToString opt x . (')' :)
     toPlain opt x = tupToString opt x
+    toJSON        = unpack . A.encode
 
 instance ToString ((Int,Int,Int,Int),[String]) where
     toLisp  opt (x,s) = ('(' :) . fourIntsToString opt x .
                         (' ' :) . toLisp opt s . (')' :)
     toPlain opt (x,s) = fourIntsToString opt x . ('\n' :) . toPlain opt s
+    toJSON            = unpack . A.encode
 
 instance ToString (String, (Int,Int,Int,Int),[String]) where
     toLisp  opt (s,x,y) = toSexp2 [toLisp opt s, ('(' :) . fourIntsToString opt x . (')' :), toLisp opt y]
     toPlain opt (s,x,y) = inter '\n' [toPlain opt s, fourIntsToString opt x, toPlain opt y]
+    toJSON              = unpack . A.encode
 
 toSexp1 :: Options -> [String] -> Builder
 toSexp1 opt ss = ('(' :) . inter ' ' (map (quote opt) ss) . (')' :)

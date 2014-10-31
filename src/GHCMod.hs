@@ -264,6 +264,9 @@ globalArgSpec =
       , option "l" ["tolisp"] "Format output as an S-Expression" $
                NoArg $ \o -> o { outputStyle = LispStyle }
 
+      , option "j" ["tojson"] "Format output as JSON" $
+               NoArg $ \o -> o { outputStyle = JsonStyle }
+
       , option "b" ["boundary"] "Output line separator"$
                reqArg "SEP" $ \s o -> o { lineSeparator = LineSeparator s }
 

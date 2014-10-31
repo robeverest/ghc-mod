@@ -19,6 +19,7 @@ type IOish m = (Functor m, MonadIO m, MonadBaseControl IO m, ExceptionMonad m)
 -- | Output style.
 data OutputStyle = LispStyle  -- ^ S expression style.
                  | PlainStyle -- ^ Plain textstyle.
+                 | JsonStyle  -- ^ JSON textstyle
                    deriving (Show)
 
 -- | The type for line separator. Historically, a Null string is used.

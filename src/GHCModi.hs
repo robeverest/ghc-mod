@@ -51,10 +51,13 @@ progVersion = "ghc-modi version " ++ showVersion version ++ " compiled by GHC " 
 argspec :: [OptDescr (Options -> Options)]
 argspec = [ Option "b" ["boundary"]
             (ReqArg (\s opts -> opts { lineSeparator = LineSeparator s }) "sep")
-            "specify line separator (default is Nul string)"
+            "specify line separator (default is Nul string) (has no effect if -j is also set)"
           , Option "l" ["tolisp"]
             (NoArg (\opts -> opts { outputStyle = LispStyle }))
             "print as a list of Lisp"
+          , Option "j" ["tojson"]
+            (NoArg (\opts -> opts { outputStyle = JsonStyle }))
+            "print as a JSON list"
           , Option "g" []
             (ReqArg (\s opts -> opts { ghcUserOptions = s : ghcUserOptions opts }) "flag") "specify a ghc flag"
           ]
